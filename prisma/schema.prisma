@@ -1,0 +1,41 @@
+generator client {
+  provider = "prisma-client-js"
+   output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+    url      = "file:./dev.db"
+}
+
+enum Role {
+  patient
+  clinician
+  admin
+}
+
+
+model User {
+  id        Int           @id @default(autoincrement())
+  name      String
+  email     String?       @unique
+  role      Role
+  createdAt DateTime      @default(now())
+
+  clinicianAppointments Appointment[] @relation("ClinicianAppointments")
+  patientAppointments   Appointment[] @relation("PatientAppointments")
+}
+
+model Appointment {
+  id          Int      @id @default(autoincrement())
+  clinicianId Int
+  patientId   Int
+  start       DateTime
+  end         DateTime
+  createdAt   DateTime @default(now())
+
+  clinician   User     @relation("ClinicianAppointments", fields: [clinicianId], references: [id])
+  patient     User     @relation("PatientAppointments", fields: [patientId], references: [id])
+
+  @@index([clinicianId, start, end])
+}
