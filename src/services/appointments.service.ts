@@ -1,16 +1,6 @@
 import { prisma } from "../db/prisma";
 import { CreateAppointmentInput, ListRangeInput } from "../schemas/appointments.schema";
 
-// function overlapWhere(cId: number, start: Date, end: Date) {
-//     return {
-//         clinicianId: cId,
-//         // if start < other.end && end > other.start
-//         start: { lt: end },
-//         end: { gt: start }
-//     };
-// }
-
-
 export async function createAppointment(input: CreateAppointmentInput) {
     const start = new Date(input.start);
     const end = new Date(input.end);
