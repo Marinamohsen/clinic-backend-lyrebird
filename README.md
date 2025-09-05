@@ -34,8 +34,12 @@ npx prisma migrate dev --name init
 3. Start the development server:
 npm run dev
 
-4. Open Prisma Studio (visual DB editor):
-npx prisma studio
+4.Seed the database
+npx prisma db seed
+This will insert the clinicians, patients, and admin exactly as in your seed file.
+
+5. Open Prisma Studio (visual DB editor):
+npx prisma studio - it opens a web interface in the browser, so you can see all users, their IDs, roles, and emails and use the IDs in testing on postman.
 
 
 ## Example requests for all endpoints:
@@ -43,10 +47,13 @@ npx prisma studio
 ##  1. Get all appointments
 curl -X GET "/appointments" \
   -H "Content-Type: application/json"
+  - X-Role: admin
+
 
 ##  2. Get appointments filtered by date range
 curl -X GET "/appointments?from=2025-09-01&to=2025-09-10" \
   -H "Content-Type: application/json"
+ - X-Role: admin
 
 ## 3. Create a new appointment
 curl -X POST "/appointments" \
@@ -63,4 +70,20 @@ curl -X GET "/clinicians/2/appointments" \
   -H "Content-Type: application/json"
 
 
+
+## Validations & Rules
+
+1. Role-based Access: Listing all appointments (GET /appointments) requires the user role to be admin.
+- Include &role=admin in query parameters or use the X-Role header.
+- List Clinician appointments (GET/clinicians/id/appointments)requires a valid clinician id.
+
+2. Overlapping Appointments:
+- The system checks whether a clinician already has an appointment that overlaps with the requested time range.
+- Touching appointments are allowed (e.g., end == other.start).
+
+3. Start and End Dates
+- start and end must be valid ISO datetime strings.
+- Start must be strictly before End
+- Zero-length or negative-length appointments are rehected
+- Appointments cannot be scheduled in the past
 
